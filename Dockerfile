@@ -164,12 +164,13 @@ RUN echo "installing pwsh" && \
 RUN echo "installing vcpkg" && \
     apt-get -y install curl zip unzip tar && \
     git clone https://github.com/Microsoft/vcpkg.git && \
-    ./vcpkg/bootstrap-vcpkg.sh
+    ./vcpkg/bootstrap-vcpkg.sh && \
+    chmod +x /workdir/vcpkg/vcpkg && \
+    ln -s /workdir/vcpkg/vcpkg /usr/bin
 
-ENV PATH="$PATH:/workdir/vcpkg"
+ENV VCPKG_ROOT="/workdir/vcpkg"
+RUN echo "done installing vcpkg"
 
-RUN echo "$PATH" && \
-    echo "done installing vcpkg"
 
 RUN mkdir /workdir/project
 
