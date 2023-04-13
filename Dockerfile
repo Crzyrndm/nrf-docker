@@ -162,6 +162,7 @@ RUN echo "installing pwsh" && \
     echo "done installing pwsh"
 
 RUN echo "installing vcpkg" && \
+    apt-get -y install curl zip unzip tar && \
     git clone https://github.com/Microsoft/vcpkg.git && \
     ./vcpkg/bootstrap-vcpkg.sh
 
