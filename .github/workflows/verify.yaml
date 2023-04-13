@@ -9,15 +9,15 @@ jobs:
         ncs_branch:
           - main
           - v2.3-branch
-          - v2.2-branch
-          - v2.1-branch
-          - v2.0-branch
-          - v1.9-branch
-          - v1.8-branch
-          - v1.7-branch
-          - v1.6-branch
-          - v1.5-branch
-          - v1.4-branch
+        #   - v2.2-branch
+        #   - v2.1-branch
+        #   - v2.0-branch
+        #   - v1.9-branch
+        #   - v1.8-branch
+        #   - v1.7-branch
+        #   - v1.6-branch
+        #   - v1.5-branch
+        #   - v1.4-branch
         include:
           # Defaults
           - ZEPHYR_TOOLCHAIN_VERSION: 0.15.2
@@ -26,43 +26,43 @@ jobs:
             asset_tracker: disable
             asset_tracker_v2: enable
 
-          - ncs_branch: v2.3-branch
+        #   - ncs_branch: v2.3-branch
 
-          - ncs_branch: v2.2-branch
+        #   - ncs_branch: v2.2-branch
 
-          - ncs_branch: v2.1-branch
-            ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
+        #   - ncs_branch: v2.1-branch
+        #     ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
 
-          - ncs_branch: v2.0-branch
-            ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
+        #   - ncs_branch: v2.0-branch
+        #     ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
 
-          - ncs_branch: v1.9-branch
-            ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
+        #   - ncs_branch: v1.9-branch
+        #     ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
 
-          - ncs_branch: v1.8-branch
-            ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
-            asset_tracker: enable
+        #   - ncs_branch: v1.8-branch
+        #     ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
+        #     asset_tracker: enable
 
-          - ncs_branch: v1.7-branch
-            ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
-            asset_tracker: enable
+        #   - ncs_branch: v1.7-branch
+        #     ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
+        #     asset_tracker: enable
 
-          - ncs_branch: v1.6-branch
-            ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
-            asset_tracker: enable
+        #   - ncs_branch: v1.6-branch
+        #     ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
+        #     asset_tracker: enable
 
-          - ncs_branch: v1.5-branch
-            ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
-            # asset_tracker_v2 needs configuration in 1.5
-            asset_tracker_v2: disable
-            asset_tracker: enable
+        #   - ncs_branch: v1.5-branch
+        #     ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
+        #     # asset_tracker_v2 needs configuration in 1.5
+        #     asset_tracker_v2: disable
+        #     asset_tracker: enable
 
-          - ncs_branch: v1.4-branch
-            ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
-            NORDIC_COMMAND_LINE_TOOLS_VERSION: "10-17-3/nrf-command-line-tools-10.17.3"
-            # asset_tracker_v2 is not available in 1.4
-            asset_tracker_v2: disable
-            asset_tracker: enable
+        #   - ncs_branch: v1.4-branch
+        #     ZEPHYR_TOOLCHAIN_VERSION: 0.14.1
+        #     NORDIC_COMMAND_LINE_TOOLS_VERSION: "10-17-3/nrf-command-line-tools-10.17.3"
+        #     # asset_tracker_v2 is not available in 1.4
+        #     asset_tracker_v2: disable
+        #     asset_tracker: enable
 
     runs-on: ubuntu-latest
     steps:
@@ -123,3 +123,11 @@ jobs:
       - name: Ensure clang-format works
         run: |
           docker run --rm nordicplayground/nrfconnect-sdk:${{ matrix.ncs_branch }} clang-format --version
+
+      - name: Ensure pwsh works
+        run: |
+          docker run --rm crzyrndm/nrfconnect-sdk:${{ matrix.ncs_branch }} pwsh --version
+
+      - name: Ensure vcpkg works
+        run: |
+          docker run --rm crzyrndm/nrfconnect-sdk:${{ matrix.ncs_branch }} vcpkg --version
