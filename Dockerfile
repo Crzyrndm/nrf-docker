@@ -166,7 +166,7 @@ RUN echo "installing vcpkg" && \
     git clone https://github.com/Microsoft/vcpkg.git && \
     ./vcpkg/bootstrap-vcpkg.sh
 
-ENV PATH="$PATH:/homedir/vcpkg"
+ENV PATH="$PATH:/workdir/vcpkg"
 
 RUN echo "$PATH" && \
     echo "done installing vcpkg"
