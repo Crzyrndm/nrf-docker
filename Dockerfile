@@ -161,6 +161,16 @@ RUN echo "installing pwsh" && \
     apt-get install -y powershell && \
     echo "done installing pwsh"
 
+# New-Item -ItemType File -Path $PROFILE.AllUsersAllHosts -Force
+# echo '$env:PATH += "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"' >> $PROFILE.AllUsersAllHosts
+# echo '$env:HOME = "/root"' >> $PROFILE.AllUsersAllHosts
+
+RUN pwshProfile="/opt/microsoft/powershell/7/profile.ps1" && \
+    pwsh -c "New-Item -ItemType File -Path $pwshProfile -Force" && \
+    echo "\$Env:PATH += \"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\"" >> $pwshProfile && \
+    echo "\$Env:HOME = \"/root\"" >> $pwshProfile && \
+    cat $pwshProfile
+
 RUN echo "installing vcpkg" && \
     apt-get -y install curl zip unzip tar && \
     git clone https://github.com/Microsoft/vcpkg.git && \
