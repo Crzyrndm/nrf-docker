@@ -30,16 +30,6 @@ RUN mkdir /workdir/.cache && \
         file \
         gcc-multilib \
         ruby && \
-    # install pwsh 7 following instruxtions from here: https://learn.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.3
-    echo "installing pwsh" && \
-    apt-get -y install apt-transport-https software-properties-common && \
-    wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb" && \
-    dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb && \
-    apt-get -y update && \
-    apt-get install -y powershell && \
-    echo "done installing pwsh" && \
-    # continue with build
     apt-get -y clean && apt-get -y autoremove && \
     #
     # Latest PIP & Python dependencies
@@ -160,6 +150,25 @@ RUN \
     esac && \
     echo "Installing requirements: bootloader/mcuboot/scripts/requirements.txt" && \
     python3 -m pip install -r bootloader/mcuboot/scripts/requirements.txt
+
+# install pwsh 7 following instruxtions from here: https://learn.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.3
+RUN echo "installing pwsh" && \
+    apt-get -y install apt-transport-https software-properties-common && \
+    wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb" && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb && \
+    apt-get -y update && \
+    apt-get install -y powershell && \
+    echo "done installing pwsh"
+
+RUN echo "installing vcpkg" && \
+    git clone https://github.com/Microsoft/vcpkg.git && \
+    ./vcpkg/bootstrap-vcpkg.sh
+
+ENV PATH="$PATH:/homedir/vcpkg"
+
+RUN echo "$PATH" && \
+    echo "done installing vcpkg"
 
 RUN mkdir /workdir/project
 
