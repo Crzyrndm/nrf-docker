@@ -151,6 +151,37 @@ RUN \
     echo "Installing requirements: bootloader/mcuboot/scripts/requirements.txt" && \
     python3 -m pip install -r bootloader/mcuboot/scripts/requirements.txt
 
+# install pwsh 7 following instruxtions from here: https://learn.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.3
+RUN echo "installing pwsh" && \
+    apt-get -y install apt-transport-https software-properties-common && \
+    wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb" && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb && \
+    apt-get -y update && \
+    apt-get install -y powershell && \
+    echo "done installing pwsh"
+
+# New-Item -ItemType File -Path $PROFILE.AllUsersAllHosts -Force
+# echo '$env:PATH += "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"' >> $PROFILE.AllUsersAllHosts
+# echo '$env:HOME = "/root"' >> $PROFILE.AllUsersAllHosts
+
+RUN pwshProfile="/opt/microsoft/powershell/7/profile.ps1" && \
+    pwsh -c "New-Item -ItemType File -Path $pwshProfile -Force" && \
+    echo "\$Env:PATH += \"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\"" >> $pwshProfile && \
+    echo "\$Env:HOME = \"/root\"" >> $pwshProfile && \
+    cat $pwshProfile
+
+RUN echo "installing vcpkg" && \
+    apt-get -y install curl zip unzip tar && \
+    git clone https://github.com/Microsoft/vcpkg.git && \
+    ./vcpkg/bootstrap-vcpkg.sh && \
+    chmod +x /workdir/vcpkg/vcpkg && \
+    ln -s /workdir/vcpkg/vcpkg /usr/bin
+
+ENV VCPKG_ROOT="/workdir/vcpkg"
+RUN echo "done installing vcpkg"
+
+
 RUN mkdir /workdir/project
 
 WORKDIR /workdir/project
