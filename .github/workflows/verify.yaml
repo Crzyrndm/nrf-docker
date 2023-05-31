@@ -131,3 +131,7 @@ jobs:
       - name: Ensure vcpkg works
         run: |
           docker run --rm crzyrndm/nrfconnect-sdk:${{ matrix.ncs_branch }} vcpkg --version
+
+      - name: Ensure clang-tidy works
+        run: |
+          docker run --rm crzyrndm/nrfconnect-sdk:${{ matrix.ncs_branch }} clang-tidy-15 --version

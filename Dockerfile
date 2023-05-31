@@ -181,6 +181,9 @@ RUN echo "installing vcpkg" && \
 ENV VCPKG_ROOT="/workdir/vcpkg"
 RUN echo "done installing vcpkg"
 
+RUN echo "Installing clang-tidy-15" && \
+    apt-get -y install clang-tidy-15 && \
+    echo "Done Installing clang-tidy-15"
 
 RUN mkdir /workdir/project
 
