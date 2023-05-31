@@ -2,8 +2,11 @@ name: Publish Docker
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - saga # publish a new version when updated
   schedule:
-    - cron: '0 0 * * 6' # UTC midnight every Saturday
+    - cron: '0 0 * * 6' # UTC midnight every Saturday (basically making sure a newish version of vcpkg is present)
 
 jobs:
   build:
