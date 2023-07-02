@@ -14,7 +14,9 @@ jobs:
       matrix:
         ncs_branch:
           - main
+          - v2.4-branch
           - v2.3-branch
+          - v2.3-aws-iot-stack-kconfig 
           # - v2.2-branch
           # - v2.1-branch
           # - v2.0-branch
