@@ -57,7 +57,7 @@ RUN mkdir /workdir/.cache && \
     #
     python3 -m pip install -U six && \
     apt-get -y install clang-format && \
-    wget -qO- https://raw.githubusercontent.com/nrfconnect/sdk-nrf/main/.clang-format > /workdir/.clang-format && \
+    wget -qO- https://raw.githubusercontent.com/Crzyrndm/sdk-nrf/main/.clang-format > /workdir/.clang-format && \
     #
     # Nordic command line tools
     # Releases: https://www.nordicsemi.com/Products/Development-tools/nrf-command-line-tools/download
@@ -131,7 +131,7 @@ RUN mkdir /workdir/.cache && \
 FROM base
 ARG sdk_nrf_revision=main
 RUN \
-    west init -m https://github.com/nrfconnect/sdk-nrf --mr ${sdk_nrf_revision} && \
+    west init -m https://github.com/Crzyrndm/sdk-nrf --mr ${sdk_nrf_revision} && \
     west update --narrow -o=--depth=1 && \
     echo "Installing requirements: zephyr/scripts/requirements.txt" && \
     python3 -m pip install -r zephyr/scripts/requirements.txt && \
