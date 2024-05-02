@@ -4,10 +4,9 @@ WORKDIR /workdir
 ARG sdk_nrf_branch=v2.7-branch
 ARG toolchain_version=v2.7.0
 ARG sdk_nrf_commit
-ARG NORDIC_COMMAND_LINE_TOOLS_VERSION="10-24-0/nrf-command-line-tools-10.24.0"
-ARG arch=amd64
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV NRFUTIL_HOME=/usr/local/share/nrfutil
 
 SHELL [ "/bin/bash", "-euxo", "pipefail", "-c" ]
 
@@ -15,64 +14,53 @@ SHELL [ "/bin/bash", "-euxo", "pipefail", "-c" ]
 # python 3.8 is installed by toolchain manager hence older version of libffi is required
 RUN <<EOT
     apt-get -y update
-    apt-get -y upgrade
-    apt-get -y install wget unzip clang-format gcc-multilib make libffi7
-    apt-get -y clean
-    rm -rf /var/lib/apt/lists/*
-EOT
 
-# Install toolchain
-# Make nrfutil install in a shared location, because when used with GitHub
-# Actions, the image will be launched with the home dir mounted from the local
-# checkout.
-ENV NRFUTIL_HOME=/usr/local/share/nrfutil
-RUN <<EOT
+    apt-get install -y software-properties-common
+    apt-add-repository ppa:git-core/ppa
+
+    apt-get -y upgrade
+    apt-get -y install \
+        ca-certificates \
+        ccache \
+        cmake \
+        curl \
+        tar \
+        unzip \
+        wget \
+        zip \
+        git \
+        apt-transport-https \
+        software-properties-common \
+        ninja-build xz-utils gcc g++ gcc-multilib device-tree-compiler libncurses5 libncurses5-dev
+
+
+    git config --global --add safe.directory '*'
+
+    wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O "awscliv2.zip"
+    unzip awscliv2.zip
+    aws/install
+    rm ./awscliv2.zip
+    rm -rf aws
+
+    source /etc/os-release
+    wget -q https://packages.microsoft.com/config/ubuntu/$VERSION_ID/packages-microsoft-prod.deb
+    dpkg -i packages-microsoft-prod.deb
+    rm packages-microsoft-prod.deb
+    apt-get update
+    apt-get install -y powershell
+
     wget -q https://developer.nordicsemi.com/.pc-tools/nrfutil/x64-linux/nrfutil
     mv nrfutil /usr/local/bin
     chmod +x /usr/local/bin/nrfutil
     nrfutil install toolchain-manager
-    nrfutil install toolchain-manager search
+    nrfutil toolchain-manager search
     nrfutil toolchain-manager install --ncs-version ${toolchain_version}
+    echo "installed toolchains list"
     nrfutil toolchain-manager list
-    rm -f /root/ncs/downloads/*
-EOT
 
-#
-# ClangFormat
-#
-RUN <<EOT
-    wget -qO- https://raw.githubusercontent.com/nrfconnect/sdk-nrf/${sdk_nrf_branch}/.clang-format > /workdir/.clang-format
-EOT
-
-# Nordic command line tools
-# Releases: https://www.nordicsemi.com/Products/Development-tools/nrf-command-line-tools/download
-RUN <<EOT
-    NCLT_BASE=https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-downloads/desktop-software/nrf-command-line-tools/sw/versions-10-x-x
-    echo "Host architecture: $arch"
-    case $arch in
-        "amd64")
-            NCLT_URL="${NCLT_BASE}/${NORDIC_COMMAND_LINE_TOOLS_VERSION}_linux-amd64.tar.gz"
-            ;;
-        "arm64")
-            NCLT_URL="${NCLT_BASE}/${NORDIC_COMMAND_LINE_TOOLS_VERSION}_linux-arm64.tar.gz"
-            ;;
-    esac
-    echo "NCLT_URL=${NCLT_URL}"
-    if [ ! -z "$NCLT_URL" ]; then
-        mkdir tmp && cd tmp
-        wget -qO - "${NCLT_URL}" | tar --no-same-owner -xz
-        # Install included JLink
-        mkdir /opt/SEGGER
-        tar xzf JLink_*.tgz -C /opt/SEGGER
-        mv /opt/SEGGER/JLink* /opt/SEGGER/JLink
-        # Install nrf-command-line-tools
-        cp -r ./nrf-command-line-tools /opt
-        ln -s /opt/nrf-command-line-tools/bin/nrfjprog /usr/local/bin/nrfjprog
-        ln -s /opt/nrf-command-line-tools/bin/mergehex /usr/local/bin/mergehex
-        cd .. && rm -rf tmp ;
-    else
-        echo "Skipping nRF Command Line Tools (not available for $arch)" ;
-    fi
+    rm -rf /root/ncs/downloads/*
+    apt-get -y clean
+    rm -rf /var/lib/apt/lists/*
 EOT
 
 # Prepare image with a ready to use build environment
@@ -85,8 +73,27 @@ RUN <<EOT
     west update --narrow -o=--depth=1
 EOT
 
+RUN pwshProfile="/opt/microsoft/powershell/7/profile.ps1" && \
+    pwsh -c "New-Item -ItemType File -Path $pwshProfile -Force" && \
+    echo "\$Env:PATH += \"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\"" >> $pwshProfile && \
+    echo "\$Env:HOME = \"/root\"" >> $pwshProfile && \
+    cat $pwshProfile
+
+RUN echo "installing vcpkg" && \
+    apt-get -y install curl zip unzip tar && \
+    git clone https://github.com/Microsoft/vcpkg.git && \
+    ./vcpkg/bootstrap-vcpkg.sh && \
+    chmod +x /workdir/vcpkg/vcpkg && \
+    ln -s /workdir/vcpkg/vcpkg /usr/bin
+
+ENV VCPKG_ROOT="/workdir/vcpkg"
+
 # Launch into build environment with the passed arguments
 # Currently this is not supported in GitHub Actions
 # See https://github.com/actions/runner/issues/1964
 ENTRYPOINT [ "nrfutil", "toolchain-manager", "launch", "/bin/bash", "--", "/root/entry.sh" ]
 COPY ./entry.sh /root/entry.sh
+
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+ENV XDG_CACHE_HOME=/workdir/.cache
