@@ -36,12 +36,6 @@ RUN <<EOT
 
     git config --global --add safe.directory '*'
 
-    wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O "awscliv2.zip"
-    unzip awscliv2.zip
-    aws/install
-    rm ./awscliv2.zip
-    rm -rf aws
-
     source /etc/os-release
     wget -q https://packages.microsoft.com/config/ubuntu/$VERSION_ID/packages-microsoft-prod.deb
     dpkg -i packages-microsoft-prod.deb
@@ -79,15 +73,6 @@ RUN pwshProfile="/opt/microsoft/powershell/7/profile.ps1" && \
     echo "\$Env:HOME = \"/root\"" >> $pwshProfile && \
     cat $pwshProfile
 
-RUN echo "installing vcpkg" && \
-    apt-get -y install curl zip unzip tar && \
-    git clone https://github.com/Microsoft/vcpkg.git && \
-    ./vcpkg/bootstrap-vcpkg.sh && \
-    chmod +x /workdir/vcpkg/vcpkg && \
-    ln -s /workdir/vcpkg/vcpkg /usr/bin
-
-ENV VCPKG_ROOT="/workdir/vcpkg"
-
 # Launch into build environment with the passed arguments
 # Currently this is not supported in GitHub Actions
 # See https://github.com/actions/runner/issues/1964
@@ -96,4 +81,4 @@ COPY ./entry.sh /root/entry.sh
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
-ENV XDG_CACHE_HOME=/workdir/.cache
+ENV XDG_CACHE_HOME=/root/.cache
