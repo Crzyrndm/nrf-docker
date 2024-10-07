@@ -31,7 +31,7 @@ RUN <<EOT
         git \
         apt-transport-https \
         software-properties-common \
-        ninja-build xz-utils gcc g++ gcc-multilib device-tree-compiler libncurses5 libncurses5-dev
+        ninja-build gcc g++ gcc-multilib
 
 
     git config --global --add safe.directory '*'
