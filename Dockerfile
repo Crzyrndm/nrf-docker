@@ -21,7 +21,6 @@ RUN <<EOT
     apt-get -y upgrade
     apt-get -y install \
         ca-certificates \
-        ccache \
         cmake \
         curl \
         tar \
