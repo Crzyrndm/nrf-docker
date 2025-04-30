@@ -26,10 +26,6 @@ jobs:
             toolchain_version: v2.8.0
             native_board: native_sim
 
-          # - sdk_nrf_branch: v2.7-branch
-          #   toolchain_version: v2.7.0
-          #   native_board: native_sim
-
           - sdk_nrf_branch: v2.7-branch
             toolchain_version: v2.7.0
             native_board: native_sim
@@ -37,10 +33,6 @@ jobs:
           - sdk_nrf_branch: v2.6-branch
             toolchain_version: v2.6.2
             native_board: native_sim
-
-          # - sdk_nrf_branch: v2.5-branch
-          #   toolchain_version: v2.5.0
-          #   native_board: native_sim
 
     runs-on: ubuntu-latest
     steps:
