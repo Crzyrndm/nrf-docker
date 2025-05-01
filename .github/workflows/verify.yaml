@@ -37,7 +37,7 @@ jobs:
       - name: Build image
         run: |
           docker build -t ${{ env.CONTAINER_TAG }}:${{ matrix.sdk_nrf_branch }} \
-            --build-arg sdk_nrf_branch=${{ matrix.sdk_nrf_branch }} \
+            --build-arg sdk_nrf_branch=${{ matrix.toolchain_version }} \
             --build-arg toolchain_version=${{ matrix.toolchain_version }} \
             .
 
